@@ -8,6 +8,6 @@ fi
 # User specific environment and startup programs                                                         
 PS1='\u:\W $$ '
 #!/bin/bash                                                                                              
-cd ./CS1XC3/
+cd ./L06/
 git pull
 cd
