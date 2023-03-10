@@ -1,0 +1,115 @@
+# /etc/profile
+
+# System wide environment and startup programs, for login setup
+# Functions and aliases go in /etc/bashrc
+
+# It's NOT a good idea to change this file unless you know what you
+# are doing. It's much better to create a custom.sh shell script in
+# /etc/profile.d/ to make custom changes to your environment, as this
+# will prevent the need for merging in future updates.
+
+pathmunge () {
+    case ":${PATH}:" in
+        *:"$1":*)
+            ;;
+        *)
+            if [ "$2" = "after" ] ; then
+                PATH=$PATH:$1
+            else
+                PATH=$1:$PATH
+            fi
+    esac
+}
+
+
+if [ -x /usr/bin/id ]; then
+    if [ -z "$EUID" ]; then
+        # ksh workaround
+        EUID=`/usr/bin/id -u`
+        UID=`/usr/bin/id -ru`
+    fi
+    USER="`/usr/bin/id -un`"
+    LOGNAME=$USER
+    MAIL="/var/spool/mail/$USER"
+fi
+
+# Path manipulation
+if [ "$EUID" = "0" ]; then
+    pathmunge /usr/sbin
+    pathmunge /usr/local/sbin
+else
+    pathmunge /usr/local/sbin after
+    pathmunge /usr/sbin after
+fi
+
+HOSTNAME=`/usr/bin/hostname 2>/dev/null`
+HISTSIZE=1000
+if [ "$HISTCONTROL" = "ignorespace" ] ; then
+    export HISTCONTROL=ignoreboth
+else
+    export HISTCONTROL=ignoredups
+fi
+
+export PATH USER LOGNAME MAIL HOSTNAME HISTSIZE HISTCONTROL
+
+# By default, we want umask to get set. This sets it for login shell
+# Current threshold for system reserved uid/gids is 200
+# You could check uidgid reservation validity in
+# /usr/share/doc/setup-*/uidgid file
+if [ $UID -gt 199 ] && [ "`/usr/bin/id -gn`" = "`/usr/bin/id -un`" ]; then
+    umask 002
+else
+    umask 022
+fi
+
+for i in /etc/profile.d/*.sh /etc/profile.d/sh.local ; do
+    if [ -r "$i" ]; then
+        if [ "${-#*i}" != "$-" ]; then 
+            . "$i"
+        else
+            . "$i" >/dev/null
+        fi
+    fi
+done
+
+unset i
+unset -f pathmunge
+
+if [ -n "${BASH_VERSION-}" ] ; then
+        if [ -f /etc/bashrc ] ; then
+                # Bash login shells run only /etc/profile
+                # Bash non-login shells run only /etc/bashrc
+                # Check for double sourcing is done in /etc/bashrc.
+                . /etc/bashrc
+       fi
+fi
+------
+ 22:53:31 up 82 days, 14:01, 27 users,  load average: 0.34, 0.40, 0.28
+USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
+alih98   pts/13   172.18.26.154    18:10    4:34m  0.12s  0.12s -bash
+joshim20 pts/10   172.18.45.214    04:53    1:16m  0.56s  0.56s -bash
+yashikay pts/71   172.18.204.72    21:21   59:15   0.28s  0.28s -bash
+pohlj    pts/103  172.18.19.239    21:49    1:00m  0.05s  0.05s -bash
+zhu232   pts/368  172.18.57.207    21:59   48:59   0.06s  0.06s -bash
+guo99    pts/400  172.18.200.208   21:49   41:31   0.06s  0.06s -bash
+guo99    pts/293  172.18.200.208   21:15    1:20m  0.08s  0.08s -bash
+wangq198 pts/434  172.18.14.169    21:57   56:18   0.06s  0.02s /usr/libexec/git-core/git-remote-https origin https://github.com/qinquan06/CS1XC3.git
+guow42   pts/432  172.26.205.128   20:07   55:48   0.25s  0.25s -bash
+kime46   pts/450  172.18.200.117   22:42   27.00s  0.13s  0.13s -bash
+johalh8  pts/380  172.18.205.223   22:52   35.00s  0.04s  0.04s -bash
+mohaa143 pts/431  172.18.17.196    18:29    5:46   0.54s  0.54s -bash
+singj93  pts/447  172.18.97.76     20:05    1:52m  0.47s  0.47s -bash
+xxxxh    pts/378  172.18.204.10    20:34    1:29m  0.29s  0.29s -bash
+yashikay pts/394  172.18.200.99    20:30    1:49m  0.37s  0.09s vim sums.c
+nairs22  pts/476  172.18.52.194    20:36    5:23   0.37s  0.37s -bash
+ansars23 pts/493  172.18.203.252   22:07   45:47   0.04s  0.04s -bash
+sahnia3  pts/503  172.18.9.49      18:19    4:00m  0.25s  0.25s -bash
+zhouz229 pts/513  172.18.41.70     20:00   45:23   0.94s  0.94s -bash
+zhouz229 pts/515  172.18.41.70     19:34    2:19m  0.12s  0.12s -bash
+daudb    pts/523  172.18.200.123   20:58    9:07   0.09s  0.09s -bash
+pandea23 pts/524  172.18.96.225    21:25    3.00s  1.10s  1.10s -bash
+sandhk20 pts/525  172.18.99.15     21:02    1:12m  0.41s  0.41s -bash
+fongj13  pts/558  172.18.13.131    22:33    3:39   0.29s  0.29s -bash
+asrans1  pts/561  172.18.22.196    22:05   46:19   0.07s  0.07s -bash
+sajua    pts/562  172.18.205.227   22:11   41:39   0.05s  0.05s -bash
+sungk5   pts/559  172.26.205.118   22:31    3.00s  0.19s  0.19s -bash
